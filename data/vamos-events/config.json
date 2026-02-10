@@ -1,0 +1,68 @@
+{
+  "business": {
+    "name": "Vamos Events",
+    "tagline": "Event Experience Redefined",
+    "owner_name": "the Vamos Events team",
+    "phone": "416-779-2728",
+    "email": "info@vamosevents.com",
+    "website": "https://www.vamosevents.ca",
+    "instagram": "https://www.instagram.com/vamosevents",
+    "about": "Vamos Events was born out of love for music and the desire to create remarkable events. Our roster includes interactive MCs, DJs, Musicians & Live Artists dedicated to turning every occasion into an unforgettable experience.",
+    "tone": "luxury",
+    "video_url": null,
+    "video_caption": "A personal welcome from our team — watch before we chat!"
+  },
+  "services": [
+    {"name": "Exclusive MCs & DJs", "description": "Hand-picked, genre-versatile performers with dynamic energy", "price_display": "$1,500–$2,200 for 4–6 hours", "category": "core"},
+    {"name": "Live & Fusion Band", "description": "Multi-talented musicians blending global genres, stationary or roaming", "price_display": "Starting from $3,000", "category": "core"},
+    {"name": "Roaming Musicians", "description": "Percussionists, electric violinists, flaming saxophonists", "price_display": "$1,000 for 2 hours per artist", "category": "entertainment"},
+    {"name": "Special Effects", "description": "Indoor sparkular cold fireworks, dry ice, laser shows, confetti", "price_display": "$500–$2,000 per effect", "category": "production"},
+    {"name": "Sound & Lighting", "description": "Professional AV with certified technicians", "price_display": "Included in packages or $1,500+", "category": "production"},
+    {"name": "Draping", "description": "Elegant venue transformation solutions", "price_display": "$1,500–$8,000", "category": "production"},
+    {"name": "Entertainment Elements", "description": "360 photo booths, elevated dancers, mentalists", "price_display": "$1,200–$3,000 per element", "category": "entertainment"},
+    {"name": "Event Consulting", "description": "Expert guidance on entertainment and AV", "price_display": "Complimentary with booking", "category": "consulting"}
+  ],
+  "pricing": {
+    "currency": "CAD",
+    "baseline_rates": {
+      "musicians_artists": {"2_hours": 1000, "4_hours": 1500, "note": "Per artist. Specialized acts may be higher."},
+      "mc_dj": {"4_hours": 1500, "5_hours": 1800, "6_hours": 2200, "note": "Varies by tier and complexity."}
+    },
+    "event_type_ranges": {
+      "wedding": {
+        "entry": {"description": "MC/DJ for ceremony + reception (5 hours)", "range": [5000, 7000]},
+        "mid": {"description": "MC/DJ + Sound & Lighting + 1-2 effects", "range": [7000, 12000]},
+        "premium": {"description": "MC/DJ + Band + Full production + Entertainment", "range": [12000, 20000]},
+        "luxury": {"description": "Full-scale production, multiple artists, venue transformation", "range": [20000, 50000]}
+      },
+      "corporate": {
+        "entry": {"description": "DJ + Basic AV (4 hours)", "range": [2500, 4000]},
+        "mid": {"description": "MC/DJ + Professional AV + Entertainment", "range": [4000, 8000]},
+        "premium": {"description": "Full production with live performers", "range": [8000, 15000]}
+      }
+    }
+  },
+  "qualification": {
+    "minimum_budgets": {"wedding": 5000, "corporate": 2500, "gala": 5000, "private_party": 2000, "default": 2500},
+    "service_areas": ["Greater Toronto Area", "Ontario", "Destination (with travel fees)"],
+    "advance_booking_days": 30
+  },
+  "booking": {
+    "mode": "owner_confirms",
+    "consultation_minutes": 30,
+    "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+    "available_hours": {"start": "10:00", "end": "18:00"},
+    "timezone": "America/Toronto"
+  },
+  "integrations": {
+    "google_calendar": {"enabled": false, "calendar_id": null},
+    "instagram": {"enabled": false},
+    "slack": {"webhook_url": null},
+    "telegram": {"bot_token": null, "chat_id": null}
+  },
+  "appearance": {
+    "primary_color": "#C8A96E",
+    "theme": "dark",
+    "avatar": "V"
+  }
+}

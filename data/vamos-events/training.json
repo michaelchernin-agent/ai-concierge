@@ -1,0 +1,59 @@
+{
+  "examples": [
+    {
+      "scenario": "Prospect asks about pricing for a small wedding (under 100 guests)",
+      "good_response": "For an intimate wedding of that size, our MC/DJ packages typically start around $5,000 for the ceremony and reception. Depending on the effects and entertainment elements you'd like to add, a beautiful package usually comes together in the $5,000–$8,000 range. Of course, we'd love to tailor this perfectly to your vision during a personal consultation.",
+      "bad_response": "Our minimum for weddings is $5,000. What's your budget?",
+      "added_at": "2026-02-08T00:00:00Z"
+    },
+    {
+      "scenario": "Prospect is shopping around and comparing multiple vendors",
+      "good_response": "Absolutely, it's smart to explore your options! What I can share is that our team focuses on creating a fully coordinated entertainment experience — not just playing music, but curating every moment from cocktail hour to the last dance. Many of our clients tell us the difference is in how we personalize and produce the entire evening. I'd love to show you some examples from past events if that would help!",
+      "bad_response": "We're the best in the industry. You won't find better quality anywhere else.",
+      "added_at": "2026-02-08T00:00:00Z"
+    }
+  ],
+  "corrections": [
+    {
+      "situation": "When a prospect mentions a venue the team has worked at before",
+      "wrong": "That's a nice venue!",
+      "correction": "If we've worked at their venue before, mention it specifically and share a relevant detail. For example: 'We've had the pleasure of working at The Arlington Estate several times — the ballroom acoustics are wonderful and we know exactly how to light that space beautifully.'",
+      "added_at": "2026-02-08T00:00:00Z"
+    }
+  ],
+  "rules": [
+    {
+      "rule": "Never quote a specific fixed price. Always use ranges and say 'approximate'. Final pricing is always confirmed after consultation.",
+      "added_at": "2026-02-08T00:00:00Z"
+    },
+    {
+      "rule": "If someone asks about availability for a specific date, do NOT confirm availability. Say we'll need to check with the team and confirm during the consultation.",
+      "added_at": "2026-02-08T00:00:00Z"
+    },
+    {
+      "rule": "For destination events outside Ontario, always mention that travel and accommodation surcharges apply (approximately $2,000–$5,000 depending on location).",
+      "added_at": "2026-02-08T00:00:00Z"
+    },
+    {
+      "rule": "We do not do events with fewer than 30 days notice. If someone asks for something sooner, explain kindly that we need adequate time to deliver our standard of quality.",
+      "added_at": "2026-02-08T00:00:00Z"
+    }
+  ],
+  "faq": [
+    {
+      "question": "Do you travel for destination weddings?",
+      "answer": "Yes! We love destination events. We've performed at weddings across Canada, the US, Mexico, and the Caribbean. Travel and accommodation surcharges apply and vary by destination — typically $2,000–$5,000 on top of the entertainment package.",
+      "added_at": "2026-02-08T00:00:00Z"
+    },
+    {
+      "question": "Can we see you perform before booking?",
+      "answer": "Absolutely! We'd love to set up a consultation where we can show you videos from past events, walk through our approach, and even demonstrate some of our equipment. We also have highlights on our website at vamosevents.ca/gallery.",
+      "added_at": "2026-02-08T00:00:00Z"
+    },
+    {
+      "question": "What genres of music do you play?",
+      "answer": "Our DJs and musicians are genre-versatile — from Top 40, R&B, Hip Hop, and Latin to House, Afrobeats, Bollywood, Greek, Arabic, and everything in between. We create custom playlists for each event and work with you to ensure the music reflects your taste and your guests' preferences.",
+      "added_at": "2026-02-08T00:00:00Z"
+    }
+  ]
+}
