@@ -426,8 +426,225 @@ async def notify_owner(agent_id: str, lead: dict, event: str):
 
 
 # ---------------------------------------------------------------------------
-# Request/Response Models
+# Email — Confirmation emails to prospects
 # ---------------------------------------------------------------------------
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASS = os.getenv("SMTP_PASS", "")
+SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "")
+
+
+async def send_confirmation_email(config: dict, lead: dict, confirmed_time: str, note: str = None):
+    """Send a branded confirmation email to the prospect."""
+    biz = config.get("business", {})
+    biz_name = biz.get("name", "Our Team")
+    owner_name = biz.get("owner_name", biz_name)
+    biz_email = biz.get("email", "")
+    biz_phone = biz.get("phone", "")
+    biz_website = biz.get("website", "")
+    primary_color = config.get("appearance", {}).get("primary_color", "#C8A96E")
+
+    data = lead.get("collected_data", {})
+    prospect_name = data.get("contact_name", data.get("name", "there"))
+    prospect_email = data.get("email")
+    event_type = data.get("event_type", "your event")
+    quote = lead.get("suggested_quote_range")
+
+    if not prospect_email:
+        print("[EMAIL] No prospect email found, skipping")
+        return
+
+    subject = f"Your Consultation with {biz_name} is Confirmed! ✨"
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#0A0A0A;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0A0A0A;padding:40px 20px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#141414;border-radius:16px;overflow:hidden;border:1px solid #2A2A2A;">
+      <!-- Header -->
+      <tr><td style="background:linear-gradient(135deg,{primary_color},#A68B4B);padding:40px 40px 32px;text-align:center;">
+        <h1 style="margin:0;font-size:28px;color:#0A0A0A;font-weight:700;letter-spacing:1px;">{biz_name}</h1>
+        <p style="margin:8px 0 0;font-size:14px;color:rgba(10,10,10,0.7);">Consultation Confirmed</p>
+      </td></tr>
+      <!-- Body -->
+      <tr><td style="padding:40px;">
+        <p style="font-size:16px;color:#F5F0E8;line-height:1.7;margin:0 0 24px;">
+          Hi {prospect_name},
+        </p>
+        <p style="font-size:15px;color:#B0A898;line-height:1.7;margin:0 0 32px;">
+          Great news! {owner_name} has confirmed your consultation. We're looking forward to discussing {event_type} with you and creating something truly unforgettable.
+        </p>
+
+        <!-- Appointment Card -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#1E1E1E;border-radius:12px;border:1px solid #2A2A2A;margin:0 0 32px;">
+          <tr><td style="padding:28px;">
+            <p style="font-size:11px;font-weight:700;color:#706A60;text-transform:uppercase;letter-spacing:2px;margin:0 0 16px;">📅 Your Consultation</p>
+            <p style="font-size:20px;font-weight:700;color:{primary_color};margin:0 0 8px;">{confirmed_time}</p>
+            <p style="font-size:14px;color:#B0A898;margin:0 0 4px;">Type: Personal consultation for {event_type}</p>
+            <p style="font-size:14px;color:#B0A898;margin:0;">Duration: ~30 minutes</p>
+            {f'<p style="font-size:14px;color:#B0A898;margin:8px 0 0;">Note: {note}</p>' if note else ''}
+          </td></tr>
+        </table>
+
+        {f'''<table width="100%" cellpadding="0" cellspacing="0" style="background:#1E1E1E;border-radius:12px;border:1px solid #2A2A2A;margin:0 0 32px;">
+          <tr><td style="padding:28px;">
+            <p style="font-size:11px;font-weight:700;color:#706A60;text-transform:uppercase;letter-spacing:2px;margin:0 0 16px;">💰 Estimated Range</p>
+            <p style="font-size:20px;font-weight:700;color:{primary_color};margin:0;">${quote[0]:,} – ${quote[1]:,} CAD</p>
+            <p style="font-size:13px;color:#706A60;margin:8px 0 0;">Final pricing confirmed after consultation</p>
+          </td></tr>
+        </table>''' if quote else ''}
+
+        <p style="font-size:15px;color:#B0A898;line-height:1.7;margin:0 0 32px;">
+          If you need to reschedule, please don't hesitate to reach out. We're flexible and want to make this as easy as possible for you.
+        </p>
+
+        <!-- Contact Info -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #2A2A2A;padding-top:24px;">
+          <tr><td style="padding-top:24px;">
+            <p style="font-size:11px;font-weight:700;color:#706A60;text-transform:uppercase;letter-spacing:2px;margin:0 0 12px;">Get in Touch</p>
+            {f'<p style="font-size:14px;color:#B0A898;margin:0 0 4px;">📧 {biz_email}</p>' if biz_email else ''}
+            {f'<p style="font-size:14px;color:#B0A898;margin:0 0 4px;">📱 {biz_phone}</p>' if biz_phone else ''}
+            {f'<p style="font-size:14px;color:#B0A898;margin:0;">🌐 {biz_website}</p>' if biz_website else ''}
+          </td></tr>
+        </table>
+      </td></tr>
+      <!-- Footer -->
+      <tr><td style="background:#0A0A0A;padding:24px 40px;text-align:center;border-top:1px solid #2A2A2A;">
+        <p style="font-size:12px;color:#706A60;margin:0;">© {datetime.now().year} {biz_name} · Powered by AI Concierge</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>"""
+
+    # Send via SMTP
+    if not SMTP_USER or not SMTP_PASS:
+        print(f"[EMAIL] SMTP not configured. Would send to {prospect_email}:")
+        print(f"[EMAIL] Subject: {subject}")
+        print(f"[EMAIL] Confirmed time: {confirmed_time}")
+        # Store email in lead for dashboard preview
+        lead["confirmation_email"] = {
+            "to": prospect_email,
+            "subject": subject,
+            "confirmed_time": confirmed_time,
+            "sent": False,
+            "html": html,
+        }
+        db.upsert_lead(config.get("_agent_id", ""), lead)
+        return
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = f"{SMTP_FROM_NAME or biz_name} <{SMTP_USER}>"
+        msg["To"] = prospect_email
+        msg["Reply-To"] = biz_email or SMTP_USER
+
+        plain = f"""Hi {prospect_name},
+
+Your consultation with {biz_name} has been confirmed!
+
+Date & Time: {confirmed_time}
+Type: Personal consultation for {event_type}
+Duration: ~30 minutes
+{f"Note: {note}" if note else ""}
+{f"Estimated range: ${quote[0]:,} - ${quote[1]:,} CAD" if quote else ""}
+
+If you need to reschedule, please reach out:
+{f"Email: {biz_email}" if biz_email else ""}
+{f"Phone: {biz_phone}" if biz_phone else ""}
+
+Looking forward to creating something unforgettable!
+— {owner_name}"""
+
+        msg.attach(MIMEText(plain, "plain"))
+        msg.attach(MIMEText(html, "html"))
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASS)
+            server.send_message(msg)
+
+        print(f"[EMAIL] Confirmation sent to {prospect_email}")
+
+        lead["confirmation_email"] = {
+            "to": prospect_email,
+            "subject": subject,
+            "confirmed_time": confirmed_time,
+            "sent": True,
+        }
+        db.upsert_lead(config.get("_agent_id", ""), lead)
+
+    except Exception as e:
+        print(f"[EMAIL] Error sending: {e}")
+
+
+# ---------------------------------------------------------------------------
+# Email preview endpoint (for dashboard demo)
+# ---------------------------------------------------------------------------
+@app.get("/api/agents/{agent_id}/leads/{lead_id}/email-preview")
+async def email_preview(agent_id: str, lead_id: str):
+    """Preview the confirmation email HTML (for demo purposes)."""
+    lead = db.get_lead(agent_id, lead_id)
+    if not lead:
+        raise HTTPException(404, "Lead not found")
+    config = db.get_config(agent_id)
+    if not config:
+        raise HTTPException(404, "Agent not found")
+
+    from fastapi.responses import HTMLResponse
+    # Generate preview
+    biz = config.get("business", {})
+    data = lead.get("collected_data", {})
+    confirmed_time = lead.get("confirmed_time", "Tuesday, March 4th at 2:00 PM ET")
+    prospect_name = data.get("contact_name", data.get("name", "there"))
+    event_type = data.get("event_type", "your event")
+    quote = lead.get("suggested_quote_range")
+    primary_color = config.get("appearance", {}).get("primary_color", "#C8A96E")
+    biz_name = biz.get("name", "")
+    owner_name = biz.get("owner_name", biz_name)
+    note = lead.get("confirmation_note", "")
+
+    html = f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#0A0A0A;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0A0A0A;padding:40px 20px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#141414;border-radius:16px;overflow:hidden;border:1px solid #2A2A2A;">
+      <tr><td style="background:linear-gradient(135deg,{primary_color},#A68B4B);padding:40px 40px 32px;text-align:center;">
+        <h1 style="margin:0;font-size:28px;color:#0A0A0A;font-weight:700;">{biz_name}</h1>
+        <p style="margin:8px 0 0;font-size:14px;color:rgba(10,10,10,0.7);">Consultation Confirmed</p>
+      </td></tr>
+      <tr><td style="padding:40px;">
+        <p style="font-size:16px;color:#F5F0E8;line-height:1.7;margin:0 0 24px;">Hi {prospect_name},</p>
+        <p style="font-size:15px;color:#B0A898;line-height:1.7;margin:0 0 32px;">
+          Great news! {owner_name} has confirmed your consultation. We're looking forward to discussing {event_type} with you.
+        </p>
+        <table width="100%" style="background:#1E1E1E;border-radius:12px;border:1px solid #2A2A2A;margin:0 0 32px;">
+          <tr><td style="padding:28px;">
+            <p style="font-size:11px;font-weight:700;color:#706A60;text-transform:uppercase;letter-spacing:2px;margin:0 0 16px;">📅 Your Consultation</p>
+            <p style="font-size:20px;font-weight:700;color:{primary_color};margin:0 0 8px;">{confirmed_time}</p>
+            <p style="font-size:14px;color:#B0A898;margin:0;">Duration: ~30 minutes</p>
+            {f'<p style="font-size:14px;color:#B0A898;margin:8px 0 0;">Note: {note}</p>' if note else ''}
+          </td></tr>
+        </table>
+        {f'<table width="100%" style="background:#1E1E1E;border-radius:12px;border:1px solid #2A2A2A;margin:0 0 32px;"><tr><td style="padding:28px;"><p style="font-size:11px;font-weight:700;color:#706A60;text-transform:uppercase;letter-spacing:2px;margin:0 0 16px;">💰 Estimated Range</p><p style="font-size:20px;font-weight:700;color:{primary_color};margin:0;">${quote[0]:,} – ${quote[1]:,} CAD</p></td></tr></table>' if quote else ''}
+        <p style="font-size:15px;color:#B0A898;line-height:1.7;margin:0 0 32px;">If you need to reschedule, please reach out anytime.</p>
+      </td></tr>
+      <tr><td style="background:#0A0A0A;padding:24px 40px;text-align:center;border-top:1px solid #2A2A2A;">
+        <p style="font-size:12px;color:#706A60;margin:0;">© {datetime.now().year} {biz_name} · Powered by AI Concierge</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table></body></html>"""
+    return HTMLResponse(content=html)
 class ChatRequest(BaseModel):
     agent_id: str
     session_id: Optional[str] = None
@@ -550,11 +767,23 @@ async def confirm_meeting(agent_id: str, lead_id: str, req: ConfirmRequest):
     if not lead:
         raise HTTPException(404, "Lead not found")
     lead["confirmed_time"] = req.confirmed_time
+    lead["confirmation_note"] = req.note
     lead["lead_status"] = "meeting_confirmed"
     lead["updated_at"] = datetime.now(timezone.utc).isoformat()
     db.upsert_lead(agent_id, lead)
-    asyncio.create_task(notify_owner(agent_id, lead, "Meeting confirmed"))
-    return {"status": "confirmed", "confirmed_time": req.confirmed_time}
+
+    # Send confirmation email to prospect
+    config = db.get_config(agent_id)
+    prospect_email = lead.get("collected_data", {}).get("email")
+    if prospect_email and config:
+        asyncio.create_task(send_confirmation_email(
+            config=config,
+            lead=lead,
+            confirmed_time=req.confirmed_time,
+            note=req.note,
+        ))
+
+    return {"status": "confirmed", "confirmed_time": req.confirmed_time, "email_sent": bool(prospect_email)}
 
 @app.post("/api/agents/{agent_id}/leads/{lead_id}/reject")
 async def reject_meeting(agent_id: str, lead_id: str, req: RejectRequest):
