@@ -255,23 +255,42 @@ def build_system_prompt(agent_id: str) -> str:
         "casual": "You are relaxed, conversational, and approachable. Keep things light and easy. No corporate-speak.",
         "warm": "You are caring, empathetic, and attentive. You listen deeply and respond thoughtfully. Personal and genuine.",
         "bold": "You are confident, energetic, and memorable. You make a strong impression. Dynamic and direct.",
+        "luxury-friendly": "You are polished and refined like a high-end concierge, yet also upbeat and genuinely enthusiastic — intimate, personal, and warm. Premium but approachable. You make every prospect feel like a VIP while keeping things natural and human.",
     }
-    tone = tone_instructions.get(biz.get("tone", "professional"), tone_instructions["professional"])
+    # Use custom tone_description if provided, otherwise fall back to tone map
+    if biz.get("tone_description"):
+        tone = biz["tone_description"]
+    else:
+        tone = tone_instructions.get(biz.get("tone", "professional"), tone_instructions["professional"])
 
     # --- Build services section ---
     services_text = ""
     if services:
         services_text = "## SERVICES OFFERED\n"
+        # Group by category
+        categories = {}
         for svc in services:
-            name = svc.get("name", "")
-            desc = svc.get("description", "")
-            price = svc.get("price_display", "")
-            services_text += f"- **{name}**"
-            if desc:
-                services_text += f" — {desc}"
-            if price:
-                services_text += f" (approximately {price})"
-            services_text += "\n"
+            cat = svc.get("category", "other")
+            if cat not in categories:
+                categories[cat] = []
+            categories[cat].append(svc)
+
+        cat_labels = {"core": "Core Services", "musicians": "Solo Musicians & Artists", "ensembles": "Ensembles & Groups", "other": "Other Services"}
+        for cat, svcs in categories.items():
+            services_text += f"\n### {cat_labels.get(cat, cat.title())}\n"
+            for svc in svcs:
+                name = svc.get("name", "")
+                desc = svc.get("description", "")
+                price = svc.get("price_display", "")
+                notes = svc.get("notes", "")
+                services_text += f"- **{name}**"
+                if desc:
+                    services_text += f" — {desc}"
+                if price:
+                    services_text += f" (approximately {price})"
+                if notes:
+                    services_text += f"\n  Details: {notes}"
+                services_text += "\n"
 
     # --- Build qualification rules ---
     qual_text = "## QUALIFICATION CRITERIA\n"
@@ -279,14 +298,29 @@ def build_system_prompt(agent_id: str) -> str:
     if min_budgets:
         qual_text += "Minimum budgets by event type:\n"
         for etype, amount in min_budgets.items():
-            qual_text += f"- {etype.title()}: ${amount:,}\n"
+            label = etype.replace("_", " ").title()
+            qual_text += f"- {label}: ${amount:,} CAD\n"
     elif qual.get("minimum_budget"):
         qual_text += f"Minimum budget: ${qual['minimum_budget']:,}\n"
 
-    if qual.get("service_areas"):
-        qual_text += f"Service areas: {', '.join(qual['service_areas'])}\n"
-    if qual.get("advance_booking_days"):
-        qual_text += f"Minimum advance booking: {qual['advance_booking_days']} days\n"
+    if qual.get("absolute_minimum"):
+        qual_text += f"\nAbsolute minimum engagement: ${qual['absolute_minimum']:,} CAD — decline below this.\n"
+
+    service_areas = qual.get("service_areas", {})
+    if service_areas:
+        qual_text += "\nService Areas & Travel:\n"
+        for key, desc in service_areas.items():
+            label = key.replace("_", " ").title()
+            qual_text += f"- {label}: {desc}\n"
+
+    disq = qual.get("disqualification_rules", {})
+    if disq:
+        qual_text += "\nDisqualification Rules:\n"
+        for key, desc in disq.items():
+            qual_text += f"- {desc}\n"
+
+    if qual.get("advance_booking"):
+        qual_text += f"\nAdvance booking: {qual['advance_booking']}\n"
 
     # --- Build custom rules from training ---
     custom_rules = ""
@@ -395,10 +429,12 @@ Flow:
 
 ## PRICING
 Currency: {pricing.get('currency', 'CAD')}
-{json.dumps(pricing.get('baseline_rates', {}), indent=2) if pricing.get('baseline_rates') else ''}
-{json.dumps(pricing.get('event_type_ranges', {}), indent=2) if pricing.get('event_type_ranges') else ''}
+{pricing.get('weekday_weekend_rule', '')}
+{pricing.get('deposit', '')}
+Payment methods: {', '.join(pricing.get('payment_methods', [])) if isinstance(pricing.get('payment_methods'), list) else pricing.get('payment_methods', '')}
+{pricing.get('additional_hours', '')}
 
-Always quote RANGES. Always say approximate. Final pricing after consultation.
+Quote both specific prices for individual services AND ranges for packages. Always say approximate. Final pricing confirmed after consultation.
 
 {qual_text}
 
@@ -408,9 +444,47 @@ Never dismissive. Always:
 2. Acknowledge their event sounds wonderful
 3. Be honest that premium services may not fit their current budget
 4. Frame as wanting to deliver the full experience
-5. Wish them well
+5. Wish them well"""
+
+    # --- Venues section ---
+    venues = config.get("venues", [])
+    venues_text = ""
+    if venues:
+        venues_text = "\n## VENUES WE'VE WORKED AT\n"
+        venues_text += "When a prospect mentions any of these venues, reference our specific experience:\n\n"
+        for v in venues:
+            venues_text += f"**{v['name']}** ({v.get('city', '')}, capacity: {v.get('capacity', 'N/A')})\n"
+            if v.get("notes"):
+                venues_text += f"- Venue notes: {v['notes']}\n"
+            if v.get("experience"):
+                venues_text += f"- Our experience: {v['experience']}\n"
+            venues_text += "\n"
+
+    # --- Brand language section ---
+    brand = config.get("brand_language", {})
+    brand_text = ""
+    if brand:
+        brand_text = "\n## BRAND LANGUAGE\n"
+        if brand.get("preferred_words"):
+            brand_text += f"USE these words naturally: {', '.join(brand['preferred_words'])}\n"
+        if brand.get("avoid_words"):
+            brand_text += f"NEVER use: {', '.join(brand['avoid_words'])}\n"
+
+    # --- Differentiator section ---
+    diff_text = ""
+    if biz.get("differentiator"):
+        diff_text = f"\n## WHAT MAKES US DIFFERENT\nWhen prospects compare us to competitors or ask what sets us apart:\n{biz['differentiator']}\n"
+
+    # --- Append additional sections ---
+    prompt += f"""
 
 {booking_text}
+
+{venues_text}
+
+{diff_text}
+
+{brand_text}
 
 {custom_rules}
 
