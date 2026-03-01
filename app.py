@@ -506,6 +506,20 @@ Respond with a JSON object:
   "ready_to_book": false,
   "preferred_times": null or ["slot1", "slot2"]
 }}
+
+IMPORTANT: Use these EXACT field names in collected_data for consistency:
+- "contact_name" for the person's name
+- "email" for email address
+- "phone" for phone number
+- "event_type" for what they're planning (wedding, retreat, party, etc.)
+- "check_in" for arrival/start date (format: "August 1, 2026")
+- "check_out" for departure/end date if mentioned
+- "nights" for number of nights
+- "event_date" for event date (non-accommodation businesses)
+- "guest_count" for number of guests/people
+- "budget" for their budget range
+- "services_interested" for which services they want
+- "location" or "venue" for event location
 """
     return prompt
 
@@ -638,14 +652,54 @@ async def get_calendar_context(agent_id: str, config: dict, collected_data: dict
     if not ical_url:
         return ""
 
-    # Check if we have dates to look up
-    check_in_str = collected_data.get("check_in") or collected_data.get("event_date") or collected_data.get("date")
+    # Check if we have dates to look up — AI may store under various field names
+    date_fields = ["check_in", "checkin", "event_date", "date", "dates",
+                   "arrival_date", "start_date", "availability_request",
+                   "preferred_dates", "requested_date", "visit_date",
+                   "travel_date", "trip_date", "booking_date", "stay_date",
+                   "desired_dates", "when", "arrival"]
+    check_in_str = None
+    for field in date_fields:
+        val = collected_data.get(field)
+        if val and isinstance(val, str) and len(val) > 3:
+            check_in_str = val.strip()
+            break
+
+    # Fallback: scan ALL collected_data values for anything that looks like a date
+    if not check_in_str:
+        import re
+        date_patterns = [
+            r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+\d{1,2}(?:\s*,?\s*\d{4})?\b',
+            r'\b\d{4}-\d{2}-\d{2}\b',
+            r'\b\d{1,2}/\d{1,2}/\d{2,4}\b',
+        ]
+        for key, val in collected_data.items():
+            if isinstance(val, str):
+                for pattern in date_patterns:
+                    match = re.search(pattern, val, re.IGNORECASE)
+                    if match:
+                        check_in_str = match.group(0).strip()
+                        print(f"[CALENDAR] Found date in field '{key}': {check_in_str}")
+                        break
+            if check_in_str:
+                break
+
     if not check_in_str:
         return ""
 
+    # Clean up common patterns — extract first date if it's a range like "Aug 1 - Aug 5"
+    if " - " in check_in_str:
+        parts = check_in_str.split(" - ")
+        check_in_str = parts[0].strip()
+    elif " to " in check_in_str.lower():
+        parts = check_in_str.lower().split(" to ")
+        check_in_str = parts[0].strip()
+
     # Try to parse the date
     check_in = None
-    for fmt in ["%Y-%m-%d", "%B %d", "%B %d, %Y", "%b %d", "%b %d, %Y", "%m/%d/%Y", "%m/%d"]:
+    for fmt in ["%Y-%m-%d", "%B %d, %Y", "%B %d %Y", "%B %d", "%b %d, %Y",
+                "%b %d %Y", "%b %d", "%m/%d/%Y", "%m/%d/%y", "%m/%d",
+                "%d %B %Y", "%d %b %Y", "%Y/%m/%d"]:
         try:
             parsed = datetime.strptime(check_in_str, fmt)
             if parsed.year < 2025:
