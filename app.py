@@ -511,6 +511,194 @@ Respond with a JSON object:
 
 
 # ---------------------------------------------------------------------------
+# Calendar Availability (iCal integration for Airbnb, Google Calendar, etc.)
+# ---------------------------------------------------------------------------
+class CalendarChecker:
+    """Fetches and parses iCal (.ics) feeds to check date availability."""
+
+    def __init__(self):
+        self._cache = {}  # agent_id -> (fetched_at, blocked_dates)
+        self._cache_ttl = 900  # 15 minutes
+
+    def _parse_ics(self, ics_text: str) -> list:
+        """Parse .ics text and return list of (start_date, end_date) tuples for blocked dates."""
+        blocked = []
+        lines = ics_text.replace("\r\n ", "").replace("\r\n\t", "").split("\n")
+        in_event = False
+        dtstart = None
+        dtend = None
+        summary = ""
+
+        for line in lines:
+            line = line.strip()
+            if line == "BEGIN:VEVENT":
+                in_event = True
+                dtstart = None
+                dtend = None
+                summary = ""
+            elif line == "END:VEVENT":
+                if in_event and dtstart:
+                    if not dtend:
+                        dtend = dtstart + timedelta(days=1)
+                    blocked.append((dtstart, dtend, summary))
+                in_event = False
+            elif in_event:
+                if line.startswith("DTSTART"):
+                    dtstart = self._parse_ical_date(line)
+                elif line.startswith("DTEND"):
+                    dtend = self._parse_ical_date(line)
+                elif line.startswith("SUMMARY:"):
+                    summary = line[8:].strip()
+
+        return blocked
+
+    def _parse_ical_date(self, line: str) -> datetime:
+        """Parse an iCal date line like DTSTART;VALUE=DATE:20250715"""
+        # Extract the date value after the last colon
+        date_str = line.split(":")[-1].strip()
+        try:
+            if len(date_str) == 8:  # DATE format: 20250715
+                return datetime.strptime(date_str, "%Y%m%d")
+            elif "T" in date_str:  # DATETIME format: 20250715T120000Z
+                date_str = date_str.replace("Z", "")
+                return datetime.strptime(date_str[:15], "%Y%m%dT%H%M%S")
+            else:
+                return datetime.strptime(date_str[:8], "%Y%m%d")
+        except ValueError:
+            return None
+
+    async def fetch_calendar(self, agent_id: str, ical_url: str) -> list:
+        """Fetch and cache iCal data. Returns list of blocked date ranges."""
+        now = datetime.now(timezone.utc)
+
+        # Check cache
+        if agent_id in self._cache:
+            fetched_at, blocked = self._cache[agent_id]
+            if (now - fetched_at).total_seconds() < self._cache_ttl:
+                return blocked
+
+        try:
+            async with httpx.AsyncClient(timeout=10) as http:
+                resp = await http.get(ical_url)
+                if resp.status_code == 200:
+                    blocked = self._parse_ics(resp.text)
+                    self._cache[agent_id] = (now, blocked)
+                    print(f"[CALENDAR] Fetched {len(blocked)} blocked ranges for {agent_id}")
+                    return blocked
+                else:
+                    print(f"[CALENDAR] Failed to fetch iCal for {agent_id}: HTTP {resp.status_code}")
+                    return self._cache.get(agent_id, (None, []))[1]
+        except Exception as e:
+            print(f"[CALENDAR] Error fetching iCal for {agent_id}: {e}")
+            return self._cache.get(agent_id, (None, []))[1]
+
+    def check_availability(self, blocked_ranges: list, check_in: datetime, check_out: datetime) -> dict:
+        """Check if dates are available. Returns availability info."""
+        conflicts = []
+        for start, end, summary in blocked_ranges:
+            if start and end:
+                # Dates overlap if check_in < end AND check_out > start
+                if check_in < end and check_out > start:
+                    conflicts.append({
+                        "blocked_from": start.strftime("%Y-%m-%d"),
+                        "blocked_to": end.strftime("%Y-%m-%d"),
+                        "reason": summary or "Reserved"
+                    })
+
+        if conflicts:
+            return {"available": False, "conflicts": conflicts}
+        return {"available": True, "conflicts": []}
+
+    def get_next_available(self, blocked_ranges: list, desired_start: datetime, num_nights: int = 2, search_days: int = 90) -> list:
+        """Find next available windows near the desired date."""
+        suggestions = []
+        for offset in range(-14, search_days):
+            candidate_start = desired_start + timedelta(days=offset)
+            if candidate_start < datetime.now():
+                continue
+            candidate_end = candidate_start + timedelta(days=num_nights)
+            result = self.check_availability(blocked_ranges, candidate_start, candidate_end)
+            if result["available"]:
+                suggestions.append({
+                    "check_in": candidate_start.strftime("%Y-%m-%d"),
+                    "check_out": candidate_end.strftime("%Y-%m-%d"),
+                    "nights": num_nights
+                })
+                if len(suggestions) >= 3:
+                    break
+        return suggestions
+
+
+calendar_checker = CalendarChecker()
+
+
+async def get_calendar_context(agent_id: str, config: dict, collected_data: dict) -> str:
+    """Build calendar availability context to inject into the AI conversation."""
+    ical_url = config.get("calendar", {}).get("ical_url")
+    if not ical_url:
+        return ""
+
+    # Check if we have dates to look up
+    check_in_str = collected_data.get("check_in") or collected_data.get("event_date") or collected_data.get("date")
+    if not check_in_str:
+        return ""
+
+    # Try to parse the date
+    check_in = None
+    for fmt in ["%Y-%m-%d", "%B %d", "%B %d, %Y", "%b %d", "%b %d, %Y", "%m/%d/%Y", "%m/%d"]:
+        try:
+            parsed = datetime.strptime(check_in_str, fmt)
+            if parsed.year < 2025:
+                parsed = parsed.replace(year=datetime.now().year)
+            check_in = parsed
+            break
+        except ValueError:
+            continue
+
+    if not check_in:
+        return ""
+
+    # Determine checkout
+    nights_str = collected_data.get("nights") or collected_data.get("num_nights")
+    nights = 2  # default minimum
+    if nights_str:
+        try:
+            nights = int(str(nights_str).strip())
+        except ValueError:
+            pass
+
+    check_out_str = collected_data.get("check_out")
+    if check_out_str:
+        for fmt in ["%Y-%m-%d", "%B %d", "%B %d, %Y", "%b %d", "%m/%d/%Y"]:
+            try:
+                check_out = datetime.strptime(check_out_str, fmt)
+                if check_out.year < 2025:
+                    check_out = check_out.replace(year=datetime.now().year)
+                nights = (check_out - check_in).days
+                break
+            except ValueError:
+                continue
+
+    check_out = check_in + timedelta(days=nights)
+
+    # Fetch calendar and check
+    blocked = await calendar_checker.fetch_calendar(agent_id, ical_url)
+    result = calendar_checker.check_availability(blocked, check_in, check_out)
+
+    if result["available"]:
+        return f"\n[CALENDAR STATUS: The dates {check_in.strftime('%B %d')} to {check_out.strftime('%B %d')} ({nights} nights) appear to be AVAILABLE. You may let the guest know these dates look open, but remind them that availability is confirmed once a deposit is received.]\n"
+    else:
+        # Find alternatives
+        alternatives = calendar_checker.get_next_available(blocked, check_in, nights)
+        alt_text = ""
+        if alternatives:
+            alt_text = " Suggest these nearby available dates: " + ", ".join(
+                [f"{a['check_in']} to {a['check_out']}" for a in alternatives]
+            )
+        return f"\n[CALENDAR STATUS: The dates {check_in.strftime('%B %d')} to {check_out.strftime('%B %d')} are NOT AVAILABLE — those dates are already reserved. Politely let the guest know and offer to check alternative dates.{alt_text}]\n"
+
+
+# ---------------------------------------------------------------------------
 # AI Agent
 # ---------------------------------------------------------------------------
 async def call_agent(agent_id: str, lead: dict, user_message: str) -> dict:
@@ -538,6 +726,17 @@ async def call_agent(agent_id: str, lead: dict, user_message: str) -> dict:
     context = ""
     if lead.get("collected_data"):
         context = f"[SYSTEM: Data collected so far: {json.dumps(lead['collected_data'])}]\n\n"
+
+    # Check calendar availability if configured
+    config = db.get_config(agent_id)
+    if config and config.get("calendar", {}).get("ical_url") and lead.get("collected_data"):
+        try:
+            cal_context = await get_calendar_context(agent_id, config, lead["collected_data"])
+            if cal_context:
+                context += cal_context + "\n"
+        except Exception as e:
+            print(f"[CALENDAR] Error getting context: {e}")
+
     messages.append({"role": "user", "content": context + user_message})
 
     try:
@@ -1416,6 +1615,40 @@ async def preview_prompt(agent_id: str):
     return {"prompt": prompt, "token_estimate": len(prompt.split()) * 1.3}
 
 
+# --- Calendar ---
+@app.get("/api/agents/{agent_id}/calendar/check")
+async def check_calendar(agent_id: str, check_in: str, check_out: str = None, nights: int = 2):
+    """Check availability for specific dates. Returns available/unavailable + alternatives."""
+    config = db.get_config(agent_id)
+    if not config:
+        raise HTTPException(404, f"Agent '{agent_id}' not found")
+
+    ical_url = config.get("calendar", {}).get("ical_url")
+    if not ical_url:
+        raise HTTPException(400, "No calendar configured for this agent")
+
+    try:
+        ci = datetime.strptime(check_in, "%Y-%m-%d")
+    except ValueError:
+        raise HTTPException(400, "check_in must be YYYY-MM-DD format")
+
+    if check_out:
+        try:
+            co = datetime.strptime(check_out, "%Y-%m-%d")
+        except ValueError:
+            raise HTTPException(400, "check_out must be YYYY-MM-DD format")
+    else:
+        co = ci + timedelta(days=nights)
+
+    blocked = await calendar_checker.fetch_calendar(agent_id, ical_url)
+    result = calendar_checker.check_availability(blocked, ci, co)
+
+    if not result["available"]:
+        result["alternatives"] = calendar_checker.get_next_available(blocked, ci, (co - ci).days)
+
+    return result
+
+
 # --- Health ---
 @app.get("/api/health")
 async def health():
@@ -1429,16 +1662,20 @@ async def health():
 
 @app.on_event("startup")
 async def startup():
-    """Seed Vamos Events config if not present."""
-    if not db.get_config("vamos-events"):
-        seed_config = Path(__file__).parent / "data" / "vamos-events" / "config.json"
-        seed_training = Path(__file__).parent / "data" / "vamos-events" / "training.json"
-        if seed_config.exists():
-            db.save_config("vamos-events", json.loads(seed_config.read_text()))
-            print("[STARTUP] Seeded vamos-events config")
-        if seed_training.exists():
-            db.save_training("vamos-events", json.loads(seed_training.read_text()))
-            print("[STARTUP] Seeded vamos-events training data")
+    """Seed all agent configs from data directory on startup."""
+    data_path = Path(__file__).parent / "data"
+    if data_path.exists():
+        for agent_dir in data_path.iterdir():
+            if agent_dir.is_dir():
+                agent_id = agent_dir.name
+                seed_config = agent_dir / "config.json"
+                seed_training = agent_dir / "training.json"
+                if seed_config.exists() and not db.get_config(agent_id):
+                    db.save_config(agent_id, json.loads(seed_config.read_text()))
+                    print(f"[STARTUP] Seeded {agent_id} config")
+                if seed_training.exists() and not db.get_training(agent_id):
+                    db.save_training(agent_id, json.loads(seed_training.read_text()))
+                    print(f"[STARTUP] Seeded {agent_id} training data")
     agents = [d.name for d in DATA_DIR.iterdir() if d.is_dir()]
     print(f"[STARTUP] AI Concierge ready — {len(agents)} agent(s): {agents}")
 
