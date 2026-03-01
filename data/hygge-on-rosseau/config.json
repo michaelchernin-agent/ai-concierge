@@ -1,0 +1,78 @@
+{
+  "business": {
+    "name": "Hygge on Rosseau",
+    "tagline": "A Nordic-inspired riverfront retreat in Muskoka designed for stillness, warmth, and intentional connection.",
+    "owner_name": "Alina",
+    "phone": null,
+    "email": "hello@hyggeonrosseau.com",
+    "website": "https://hyggeonrosseau.com",
+    "instagram": "https://www.instagram.com/hyggeonrosseau",
+    "airbnb": "Superhost listing",
+    "about": "Hygge on Rosseau is a thoughtfully designed Nordic-inspired retreat located on the peaceful Shadow River in Muskoka. Inspired by the Danish concept of hygge — presence, warmth, and intentional living — the cabin was created as a sanctuary for guests seeking connection and restoration. Set on 7.5 acres of forested privacy, the property offers direct riverfront access, panoramic spa experiences, and immersive natural surroundings. During warmer months, guests can enjoy a scenic 30–40 minute canoe or kayak paddle along the Shadow River that connects to Lake Rosseau. This is not a party cottage. It is an elevated, boutique retreat experience centered around calm design, spa rituals, and meaningful time together.",
+    "tone": "warm-luxury",
+    "tone_description": "Warm, friendly, and refined — like a thoughtful host who genuinely cares about the guest experience. Boutique luxury without being flashy. Calm, inviting, and intentional. Never salesy, never pushy. You speak with the quiet confidence of someone who has created something truly special and wants to share it with the right guests.",
+    "differentiator": "Authentic Nordic-inspired design — not generic cottage decor. Private panoramic barrel sauna with forest and river views, cedar hot tub, and cold plunge — exclusively for your use. Riverfront seclusion on 7.5 acres with paddle connection to Lake Rosseau. Designed for presence, not parties. Curated experiences including private chef, floating sauna, and wellness coaching. This is not a rental — it's a retreat.",
+    "video_url": null,
+    "video_caption": "A personal welcome from Alina — watch before we chat!"
+  },
+  "services": [
+    {"name": "Private Cabin Stay", "description": "Exclusive use of 3BR/2BA Nordic cabin (sleeps 6) on 7.5-acre Shadow River property", "price_range": [600, 1050], "price_display": "$600–$1,050+ per night", "notes": "2-night minimum. 3-night minimum on long weekends.", "category": "stay"},
+    {"name": "Private Nordic Spa", "description": "Wood-burning panoramic barrel sauna (forest + river views), cedar hot tub, cold plunge", "price_range": null, "price_display": "Included", "notes": "Signature highlight of the property. Exclusively for guest use.", "category": "included"},
+    {"name": "Outdoor Shower & Cold Plunge", "description": "Rustic hot + cold outdoor shower with cold plunge bucket", "price_range": null, "price_display": "Included", "notes": "Seasonal availability", "category": "included"},
+    {"name": "Riverfront Access", "description": "Private dock on Shadow River", "price_range": null, "price_display": "Included", "notes": "Located on Shadow River, not directly on Lake Rosseau.", "category": "included"},
+    {"name": "Canoe & Kayaks", "description": "Scenic paddle connecting to Lake Rosseau (~30–40 mins)", "price_range": null, "price_display": "Included", "notes": "Warm season only.", "category": "included"},
+    {"name": "Firepit Lounge", "description": "Outdoor seating area with firepit", "price_range": null, "price_display": "Included", "notes": "Seasonal.", "category": "included"},
+    {"name": "Private Chef Experience", "description": "Multi-course private in-cabin dining", "price_range": null, "price_display": "Custom quote", "notes": "Curated chef partner. Offer only after booking interest confirmed.", "category": "experiences"},
+    {"name": "Floating Sauna Experience", "description": "Barrel sauna mounted on pontoon boat", "price_range": null, "price_display": "Seasonal", "notes": "Warm months only. Weather dependent. Offer only after booking interest confirmed.", "category": "experiences"},
+    {"name": "Wellness Coaching Session", "description": "1:1 guided reset session", "price_range": null, "price_display": "Custom", "notes": "Delivered by external coach. Compatibility call coordinated by Alina. Offer only after booking interest confirmed.", "category": "experiences"},
+    {"name": "Celebration Add-On", "description": "Prosecco + handwritten note", "price_range": null, "price_display": "Custom", "notes": "Upon request. Offer only after booking interest confirmed.", "category": "experiences"}
+  ],
+  "pricing": {
+    "currency": "CAD",
+    "nightly_range": "$600–$1,050+ per night",
+    "minimum_nightly": 600,
+    "minimum_stay": "2 nights (3 nights on long weekends)",
+    "cleaning_fee": "$250 per stay",
+    "security_deposit": "$500 refundable",
+    "quote_style": "Quote ranges only. Never promise exact totals without specific dates. AI must never calculate final totals.",
+    "upsell_script": "If you'd like to elevate your stay further, we can also help arrange a private chef experience, a floating sauna session during summer, or a curated wellness coaching session tailored to your goals."
+  },
+  "qualification": {
+    "minimum_budgets": {
+      "nightly_minimum": 600
+    },
+    "absolute_minimum": 600,
+    "max_occupancy": 6,
+    "sister_property_rule": "If guest party exceeds 6: 'Hygge on Rosseau accommodates up to 6 guests. For groups larger than 6, we recommend our sister cabin, which sleeps up to 8 guests comfortably. I'd be happy to share the details and availability for your dates.' Do not compare. Do not justify. Just offer. Never suggest exceeding occupancy.",
+    "disqualification_rules": {
+      "party_exceeds_6": "Redirect to sister property immediately",
+      "party_or_event_intent": "Politely decline — this is a retreat, not a party venue",
+      "loud_event": "Politely decline — designed for calm and connection",
+      "budget_below_600": "Politely explain minimum nightly rate"
+    },
+    "service_areas": {
+      "location": "Shadow River, Muskoka, Ontario",
+      "lake_clarification": "NOT directly on Lake Rosseau. Canoe/kayak access connects to Lake Rosseau in warm season via 30–40 min paddle."
+    },
+    "advance_booking": "Minimum notice: 2 days (if available). Most guests book 1–4 months in advance. Summer books 3–6 months ahead."
+  },
+  "booking": {
+    "mode": "owner_confirms",
+    "consultation_minutes": 20,
+    "consultation_format": ["Phone", "Messaging"],
+    "consultation_with": "Alina",
+    "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+    "available_hours": {"start": "09:00", "end": "20:00"},
+    "timezone": "America/Toronto",
+    "timezone_display": "ET"
+  },
+  "brand_language": {
+    "preferred_words": ["Nordic-inspired", "riverfront sanctuary", "curated retreat", "intentional living", "forest views", "slow mornings", "elevated comfort", "presence", "stillness", "warmth", "restoration", "immersive", "panoramic", "seclusion", "boutique"],
+    "avoid_words": ["party cottage", "cheap", "budget stay", "lakefront", "loud", "basic rental", "generic", "deal", "bargain"]
+  },
+  "appearance": {
+    "primary_color": "#7A8B6F",
+    "theme": "dark",
+    "avatar": "H"
+  }
+}
