@@ -1,0 +1,77 @@
+{
+  "business": {
+    "name": "Beauty Experts",
+    "tagline": "Be. the best version of yourself",
+    "owner_name": "Anya",
+    "phone": "416-617-2692",
+    "email": "Anyaschwartzburg@gmail.com",
+    "website": null,
+    "instagram": "https://www.instagram.com/therealbeautyexperts",
+    "about": "Beauty Experts, led by Anya, is renowned for delivering top-tier makeup and hair services across weddings, events, and Netflix productions. We've repeatedly been the glam squad for Miss Universe Canada, bringing that high-profile expertise to every client. What sets us apart is our consistent reliability and the experience we create. Beyond flawless glam, we ensure every client feels confident, radiant, and stress-free — whether for their big day or a red-carpet moment.",
+    "tone": "confident-warm",
+    "tone_description": "Confident but warm — polished yet approachable. Clients sense your expertise right away, but the tone is also intimate and reassuring. Calm, professional, with a touch of charm. Clients feel both impressed and at ease. Never casual, rushed, or overly informal.",
+    "differentiator": "High-Level Experience: Recurring Glam Squad member for Miss Universe Canada, experience working with international celebrities, and involvement in Netflix productions — bringing stage, camera, and luxury-event expertise to every client. Reliability & Professionalism: Early arrivals, structured timelines, calm energy, and seamless execution — especially critical for weddings and high-pressure mornings. Luxury Detail & Long-Wear Finish: Premium skincare prep, professional-grade products, upper body glow enhancement, and polished hair styling designed to last all day and photograph beautifully.",
+    "video_url": null,
+    "video_caption": "A personal welcome from Anya — watch before we chat!"
+  },
+  "services": [
+    {"name": "Special Occasion Makeup", "description": "Full-face luxury makeup, skin prep, lashes included", "price_range": [90, 130], "price_display": "$90–$130", "notes": "Price varies by look complexity & early call time", "category": "makeup"},
+    {"name": "Bridal Makeup", "description": "In-depth consultation, premium skin prep, long-wear bridal glam, lashes", "price_range": [150, 250], "price_display": "$150–$250", "notes": "Reflects longevity, detail & photography-ready finish", "category": "bridal"},
+    {"name": "Bridal Trial", "description": "Full bridal preview session", "price_range": [120, 180], "price_display": "$120–$180", "notes": "Recommended 4–8 weeks before wedding", "category": "bridal"},
+    {"name": "Event Hair Styling", "description": "Blowout, curls, sleek styles, soft updos", "price_range": [90, 150], "price_display": "$90–$150", "notes": "Depends on length & style complexity", "category": "hair"},
+    {"name": "Bridal Hair Styling", "description": "Detailed updo or Hollywood waves, veil placement", "price_range": [150, 250], "price_display": "$150–$250", "notes": "Designed for all-day hold", "category": "bridal"},
+    {"name": "Makeup + Hair Package", "description": "Complete glam service — makeup and hair combined", "price_range": [180, 350], "price_display": "$180–$350", "notes": "Bundle pricing available", "category": "packages"},
+    {"name": "Group Glam (3+ clients)", "description": "On-location glam for bridal parties or events", "price_range": null, "price_display": "Custom Quote", "notes": "May include assistant for larger groups. Quoted based on group size and services.", "category": "packages"},
+    {"name": "Early Morning Call (Before 7AM)", "description": "Priority early arrival for early timelines", "price_range": [25, 60], "price_display": "$25–$60", "notes": "Based on start time. Before 8AM fee applies.", "category": "fees"},
+    {"name": "Travel Fee", "description": "On-location service travel", "price_range": [35, 150], "price_display": "$35–$150", "notes": "Calculated per km outside local radius", "category": "fees"}
+  ],
+  "pricing": {
+    "currency": "CAD",
+    "seasonal_note": "Holiday bookings (November–December) may require minimum service bookings. Destination weddings priced separately.",
+    "deposit": "40–50% of total booking required to secure date. Non-refundable but transferable with adequate notice. For smaller single appointments: flat security deposit ($100–$150) applied toward total.",
+    "payment_methods": ["E-transfer", "Cash"],
+    "balance_due": "Final balance due on event date unless otherwise agreed.",
+    "quote_style": "Always quote starting prices or ranges. Never lock into final pricing without full event details (date, location, start time, type and number of services, detailed description).",
+    "time_per_client": "Bridal Makeup: 60–75 min. Bridal Hair: 45–75 min. Non-bridal: slightly shorter. Child glam: 30 min."
+  },
+  "qualification": {
+    "minimum_budgets": {
+      "wedding_bride_only": 200,
+      "bridal_party_3_plus": 400,
+      "special_event": 180,
+      "destination_wedding": 1000
+    },
+    "disqualification_rules": {
+      "budget_below_minimum": "Politely decline if below minimum for event type",
+      "date_unavailable": "Dates are secured only once deposit is received. Do not hold dates without payment.",
+      "difficult_client": "If prospect's tone is disrespectful or aggressive, remain professional but keep responses minimal and do not pursue the booking"
+    },
+    "service_areas": {
+      "primary": "Greater Toronto Area (local radius)",
+      "travel_fee": "Calculated per km outside local radius ($35–$150)",
+      "destination": "Available — travel + accommodation required, custom package pricing"
+    },
+    "advance_booking": "Weddings: typically 6–12 months in advance. Special events: 1–6 months. Subject to availability.",
+    "peak_season": "May–October is peak wedding season. Book early to secure dates."
+  },
+  "booking": {
+    "mode": "owner_confirms",
+    "consultation_minutes": 30,
+    "consultation_format": ["Phone", "Zoom"],
+    "consultation_with": "Anya",
+    "next_step_after_consultation": "Makeup or Makeup/Hair trial if required",
+    "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+    "available_hours": {"start": "09:00", "end": "19:00"},
+    "timezone": "America/Toronto",
+    "timezone_display": "ET"
+  },
+  "brand_language": {
+    "preferred_words": ["luxury bridal glam", "camera-ready finish", "long-wear performance", "photography-proof", "structured timeline", "seamless experience", "refined", "polished", "elevated beauty", "premium skin prep", "professional-grade", "cohesive glow", "upper body luminosity", "all-day hold", "calm stress-free morning", "exclusive booking", "date secured", "bridal morning flow", "bridal preview session", "tailored to your features", "I recommend", "based on experience", "to ensure longevity"],
+    "avoid_words": ["cheap", "discount", "deal", "basic makeup", "quick glam", "just makeup", "simple job", "no problem I can lower it", "I'm available anytime", "I can hold the date without deposit", "whatever works for you", "I really need this booking", "I think", "maybe", "probably", "I guess", "it should be fine", "usually works"]
+  },
+  "appearance": {
+    "primary_color": "#D4A0A0",
+    "theme": "dark",
+    "avatar": "BE"
+  }
+}
