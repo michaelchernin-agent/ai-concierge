@@ -809,26 +809,50 @@ async def call_agent(agent_id: str, lead: dict, user_message: str) -> dict:
         )
         raw = response.content[0].text.strip()
 
-        # Parse JSON
+        # Parse JSON — handle various formats the AI might return
+        # Strip markdown code fences
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
             if raw.endswith("```"):
                 raw = raw[:-3]
             raw = raw.strip()
 
+        # Try direct JSON parse first
         try:
-            return json.loads(raw)
+            result = json.loads(raw)
+            return result
         except json.JSONDecodeError:
-            return {
-                "message": raw,
-                "collected_data": {},
-                "lead_status": lead.get("lead_status", "gathering_info"),
-                "qualification_score": lead.get("qualification_score", 0),
-                "qualification_notes": "JSON parse failed",
-                "suggested_quote_range": None,
-                "ready_to_book": False,
-                "preferred_times": None,
-            }
+            pass
+
+        # AI sometimes returns text before the JSON object — find the JSON
+        json_start = raw.find("{")
+        json_end = raw.rfind("}")
+        if json_start != -1 and json_end != -1 and json_end > json_start:
+            json_candidate = raw[json_start:json_end + 1]
+            try:
+                result = json.loads(json_candidate)
+                # If the AI wrote a message before the JSON, prefer the one inside JSON
+                return result
+            except json.JSONDecodeError:
+                pass
+
+        # Last resort — return raw text as message, but strip any JSON-looking content
+        clean_message = raw
+        if json_start != -1:
+            clean_message = raw[:json_start].strip()
+        if not clean_message:
+            clean_message = raw
+
+        return {
+            "message": clean_message,
+            "collected_data": {},
+            "lead_status": lead.get("lead_status", "gathering_info"),
+            "qualification_score": lead.get("qualification_score", 0),
+            "qualification_notes": "JSON parse failed",
+            "suggested_quote_range": None,
+            "ready_to_book": False,
+            "preferred_times": None,
+        }
     except Exception as e:
         print(f"Claude API error: {e}")
         return {

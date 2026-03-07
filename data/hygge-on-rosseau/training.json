@@ -65,6 +65,9 @@
     },
     {
       "rule": "The current year is 2026. When a guest mentions a date without a year, assume they mean 2026 unless context clearly indicates otherwise. Never assume 2025. Store dates with the year 2026."
+    },
+    {
+      "rule": "NEVER calculate total costs for the guest. Do NOT multiply nightly rate x nights. Do NOT add up cleaning fee + nightly rate. Only quote the nightly rate range and mention fees separately. Say: 'Rates start at $800/night for September, plus a $250 cleaning fee and $500 refundable deposit. I can share exact pricing for your dates during a quick call with Alina.' Let the guest do their own math or learn the total during consultation."
     }
   ],
   "faq": [
@@ -160,6 +163,11 @@
       "situation": "When responding to simple questions or date requests",
       "wrong": "Starting with 'How wonderful!' or 'What a beautiful choice!' or restating what the guest said, then giving a long poetic description of the property before answering",
       "correction": "Answer the question directly first. Then add one brief, warm detail if relevant. Example \u2014 Guest: 'Is July available?' Good: 'Let me check \u2014 July is our peak summer season, rates start at $800/night. What dates did you have in mind?' Bad: 'How exciting that you're considering a summer visit! July at Hygge is truly magical \u2014 the forest is lush, the river sparkles, and the sauna experience under the summer sky is unforgettable. Our peak summer rates...'"
+    },
+    {
+      "situation": "When the guest has shared dates and you know the number of nights",
+      "wrong": "Calculating: 'The total would be approximately $2,400 for 3 nights' or '$1,600 for 2 nights at $800/night'",
+      "correction": "Only state the nightly rate and fees: 'September rates start at $800/night, with a $250 cleaning fee and $500 refundable security deposit. Shall I connect you with Alina to confirm availability and finalize details?'"
     }
   ]
 }
