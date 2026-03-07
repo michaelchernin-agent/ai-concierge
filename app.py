@@ -414,6 +414,8 @@ Ask ONE question at a time. Build naturally on the prospect's responses.
 The prospect has just watched a personal video introduction from {owner_name}.
 Your first message should warmly reference the video and transition into discovery.
 
+IMPORTANT: Today's date is {datetime.now().strftime('%B %d, %Y')}. The current year is {datetime.now().year}. When guests mention dates without a year, assume they mean {datetime.now().year} (or {datetime.now().year + 1} if the date has clearly passed this year).
+
 Flow:
 1. Warm handoff from video — reference {owner_name} and what they said
 2. Ask what kind of event/project they're planning
@@ -702,8 +704,13 @@ async def get_calendar_context(agent_id: str, config: dict, collected_data: dict
                 "%d %B %Y", "%d %b %Y", "%Y/%m/%d"]:
         try:
             parsed = datetime.strptime(check_in_str, fmt)
-            if parsed.year < 2025:
-                parsed = parsed.replace(year=datetime.now().year)
+            if parsed.year < 2026:
+                # If no year was in the string, default to current year
+                current_year = datetime.now().year
+                parsed = parsed.replace(year=current_year)
+                # If the date has already passed this year, assume next year
+                if parsed < datetime.now() - timedelta(days=1):
+                    parsed = parsed.replace(year=current_year + 1)
             check_in = parsed
             break
         except ValueError:
