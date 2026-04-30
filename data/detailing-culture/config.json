@@ -1,33 +1,176 @@
 {
-  "agent_id": "detailing-culture",
-  "name": "The Detailing Culture",
-  "tagline": "Premium auto care in Toronto",
-  "avatar": "DC",
-  "color": "#b8892e",
-  "tone": "warm, honest, confident — never pushy",
-
-  "system_prompt": "You are the booking assistant for The Detailing Culture, a premium auto detailing business in Toronto. Your job is to understand what the client needs, give them an honest recommendation, and guide them toward booking via the contact form.\n\nBe warm, concise, and genuinely helpful. Never upsell something the client doesn't need. If their car is leased or they're selling soon, tell them ceramic coating isn't worth it. If they're not sure what they need, ask 2-3 quick questions and give a clear recommendation.\n\nAlways keep responses short — 2 to 4 sentences. End with a clear next step.\n\nSERVICES & PRICING:\n\nFull Detail:\n- Maintenance Wash (returning clients within 3 months): Small $175 / Mid SUV $225 / Large SUV or Minivan $275\n- Reset Wash (first visit or deep clean): Small $275 / Mid SUV $325 / Large SUV or Minivan $375\n- Ceramic Add-On (optional, after Reset only, includes paint polish and full surface prep): Small +$500 / Mid +$550 / Large +$600\n\nPartial:\n- Exterior Only (wash, dry, wheels, trim): Small $100 / Mid $125 / Large $150\n- Interior Only (vacuum, surfaces, glass, trim): Small $125 / Mid $150 / Large $175\n\nVEHICLE CLASSES:\n- Small: sedans and hatchbacks — Honda Civic, Tesla Model 3, BMW 3 Series\n- Mid SUV: Toyota RAV4, Tesla Model Y, BMW X3\n- Large SUV or Minivan: BMW X5, Tesla Model X, Toyota Highlander, minivans\n\nKEY RULES:\n- Ceramic coating is always optional. Never push it. If the car is leased or being sold, advise against it.\n- First-time clients always start with a Reset Wash, not Maintenance.\n- Returning clients who come back within 3 months qualify for the lower Maintenance rate.\n- Interior-only is priced higher than exterior-only because it is more detailed and time-consuming.\n- Products used include CarPro, Koch Chemie, and Bilt-Hamber — professional grade only.\n- Do not make up services or prices not listed above.\n- Always end by directing the client to fill out the booking form on this page.",
-
+  "business": {
+    "name": "The Detailing Culture",
+    "tagline": "Premium Auto Care in Toronto",
+    "owner_name": "Your Name",
+    "phone": "",
+    "email": "",
+    "website": "https://thedetailingculture.com",
+    "instagram": "",
+    "about": "The Detailing Culture is a premium auto detailing business based in Toronto. We believe detailing isn't a luxury — it's smart maintenance done beautifully. Every vehicle gets the same careful attention, whether it's a Civic or a Cayenne. We use only professional-grade products including CarPro, Koch Chemie, and Bilt-Hamber, chosen specifically for each vehicle's paint system and finish. We're honest about what your car needs — and equally honest about what it doesn't.",
+    "tone": "warm-honest",
+    "tone_description": "Warm, honest, and confident — like advice from a knowledgeable friend. Never pushy. Never upselling. Direct and helpful, with genuine care for the client's car and budget.",
+    "differentiator": "We don't rush cars to maximize volume. We give every vehicle the time and attention it deserves. We'll tell you when ceramic coating isn't worth it on your lease. We'll tell you when your car doesn't need a full reset. That honesty is what keeps our clients coming back. Our products are professional grade — not what's most expensive, but what's right for your specific vehicle.",
+    "video_url": null,
+    "video_caption": null
+  },
   "services": [
-    { "name": "Exterior Only", "price_small": 100, "price_mid": 125, "price_large": 150 },
-    { "name": "Interior Only", "price_small": 125, "price_mid": 150, "price_large": 175 },
-    { "name": "Maintenance Wash", "price_small": 175, "price_mid": 225, "price_large": 275 },
-    { "name": "Reset Wash", "price_small": 275, "price_mid": 325, "price_large": 375 },
-    { "name": "Ceramic Coating Add-On", "price_small": 500, "price_mid": 550, "price_large": 600, "note": "Includes paint polish and full surface prep. Only after Reset Wash." }
+    {
+      "name": "Reset Wash — Small Vehicle",
+      "description": "Full interior and exterior deep clean for sedans and hatchbacks. First visit or full restoration.",
+      "price_range": [275, 275],
+      "price_display": "$275",
+      "notes": "For Honda Civic, Tesla Model 3, BMW 3 Series, VW Golf, and similar. First-time clients always start with a Reset.",
+      "category": "reset"
+    },
+    {
+      "name": "Reset Wash — Mid SUV",
+      "description": "Full interior and exterior deep clean for mid-size SUVs.",
+      "price_range": [325, 325],
+      "price_display": "$325",
+      "notes": "For Toyota RAV4, Tesla Model Y, BMW X3, Honda CR-V, and similar.",
+      "category": "reset"
+    },
+    {
+      "name": "Reset Wash — Large SUV / Minivan",
+      "description": "Full interior and exterior deep clean for large SUVs and minivans.",
+      "price_range": [375, 375],
+      "price_display": "$375",
+      "notes": "For BMW X5, Tesla Model X, Toyota Highlander, Dodge Caravan, Porsche Cayenne, and similar.",
+      "category": "reset"
+    },
+    {
+      "name": "Maintenance Wash — Small Vehicle",
+      "description": "Regular upkeep for returning clients within 3 months of their last visit.",
+      "price_range": [175, 175],
+      "price_display": "$175",
+      "notes": "Only available to returning clients within 3 months. New clients start with Reset Wash.",
+      "category": "maintenance"
+    },
+    {
+      "name": "Maintenance Wash — Mid SUV",
+      "description": "Regular upkeep for returning clients within 3 months of their last visit.",
+      "price_range": [225, 225],
+      "price_display": "$225",
+      "notes": "Only available to returning clients within 3 months.",
+      "category": "maintenance"
+    },
+    {
+      "name": "Maintenance Wash — Large SUV / Minivan",
+      "description": "Regular upkeep for returning clients within 3 months of their last visit.",
+      "price_range": [275, 275],
+      "price_display": "$275",
+      "notes": "Only available to returning clients within 3 months.",
+      "category": "maintenance"
+    },
+    {
+      "name": "Exterior Only — Small Vehicle",
+      "description": "Hand wash, dry, wheels, and trim. No interior.",
+      "price_range": [100, 100],
+      "price_display": "$100",
+      "notes": "Great for clients who maintain their interior themselves.",
+      "category": "partial"
+    },
+    {
+      "name": "Exterior Only — Mid SUV",
+      "description": "Hand wash, dry, wheels, and trim. No interior.",
+      "price_range": [125, 125],
+      "price_display": "$125",
+      "category": "partial"
+    },
+    {
+      "name": "Exterior Only — Large SUV / Minivan",
+      "description": "Hand wash, dry, wheels, and trim. No interior.",
+      "price_range": [150, 150],
+      "price_display": "$150",
+      "category": "partial"
+    },
+    {
+      "name": "Interior Only — Small Vehicle",
+      "description": "Vacuum, wipe-down of all surfaces, glass cleaning, and trim care.",
+      "price_range": [125, 125],
+      "price_display": "$125",
+      "notes": "Interior is priced higher than exterior due to the detail and time required.",
+      "category": "partial"
+    },
+    {
+      "name": "Interior Only — Mid SUV",
+      "description": "Vacuum, wipe-down of all surfaces, glass cleaning, and trim care.",
+      "price_range": [150, 150],
+      "price_display": "$150",
+      "category": "partial"
+    },
+    {
+      "name": "Interior Only — Large SUV / Minivan",
+      "description": "Vacuum, wipe-down of all surfaces, glass cleaning, and trim care.",
+      "price_range": [175, 175],
+      "price_display": "$175",
+      "category": "partial"
+    },
+    {
+      "name": "Ceramic Coating Add-On — Small Vehicle",
+      "description": "Professional ceramic coating applied after a Reset Wash. Includes full paint polish and surface prep.",
+      "price_range": [500, 500],
+      "price_display": "+$500",
+      "notes": "Only available as an add-on to a Reset Wash. NOT recommended for leased vehicles or cars being sold soon.",
+      "category": "addon"
+    },
+    {
+      "name": "Ceramic Coating Add-On — Mid SUV",
+      "description": "Professional ceramic coating applied after a Reset Wash. Includes full paint polish and surface prep.",
+      "price_range": [550, 550],
+      "price_display": "+$550",
+      "notes": "Only available as an add-on to a Reset Wash. NOT recommended for leased vehicles or cars being sold soon.",
+      "category": "addon"
+    },
+    {
+      "name": "Ceramic Coating Add-On — Large SUV / Minivan",
+      "description": "Professional ceramic coating applied after a Reset Wash. Includes full paint polish and surface prep.",
+      "price_range": [600, 600],
+      "price_display": "+$600",
+      "notes": "Only available as an add-on to a Reset Wash. NOT recommended for leased vehicles or cars being sold soon.",
+      "category": "addon"
+    }
   ],
-
-  "vehicle_classes": {
-    "small": ["Honda Civic", "Toyota Corolla", "Tesla Model 3", "BMW 3 Series", "VW Golf", "Audi A4"],
-    "mid_suv": ["Toyota RAV4", "Honda CR-V", "Tesla Model Y", "BMW X3", "Audi Q5"],
-    "large_suv_van": ["BMW X5", "Tesla Model X", "Toyota Highlander", "Dodge Caravan", "Genesis GV80", "Porsche Cayenne"]
+  "pricing": {
+    "currency": "CAD",
+    "notes": "Prices may vary slightly based on vehicle condition. Heavily soiled or neglected vehicles may require additional time and product. Client will always be informed before any adjustment.",
+    "deposit": "No deposit required. Payment on completion.",
+    "payment_methods": ["E-transfer", "Cash", "Credit Card"],
+    "taxes": "Prices do not include applicable taxes."
   },
-
+  "qualification": {
+    "minimum_budgets": {
+      "exterior_only": 100,
+      "interior_only": 125,
+      "maintenance": 175,
+      "reset": 275
+    },
+    "absolute_minimum": 100,
+    "disqualification_rules": {
+      "ceramic_on_lease": "Always advise against ceramic coating for leased vehicles — it is not a good investment.",
+      "ceramic_selling_soon": "If client is selling the car within 12 months, advise ceramic coating is likely not worth it.",
+      "new_client_maintenance": "New clients cannot book a Maintenance Wash — they must start with a Reset Wash."
+    },
+    "service_areas": {
+      "primary": "Toronto and GTA",
+      "notes": "Contact for locations outside GTA."
+    }
+  },
   "booking": {
-    "method": "contact_form",
+    "mode": "form",
     "form_fields": ["name", "email", "car_year", "car_model", "service", "comments"],
-    "response_time": "within a few hours"
+    "response_time": "within a few hours",
+    "available_days": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+    "timezone": "America/Toronto"
   },
-
-  "location": "Toronto, Ontario",
-  "currency": "CAD"
+  "brand_language": {
+    "preferred_words": ["care", "honest", "detail", "protect", "preserve", "restore", "culture", "precision", "premium", "investment"],
+    "avoid_words": ["cheap", "discount", "quick", "basic", "standard", "upsell", "package deal", "promotional"]
+  },
+  "appearance": {
+    "primary_color": "#b8892e",
+    "theme": "light",
+    "avatar": "DC"
+  }
 }
