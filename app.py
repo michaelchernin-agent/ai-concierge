@@ -57,13 +57,10 @@ ADMIN_API_KEY = os.getenv("ADMIN_API_KEY", "")
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
 app = FastAPI(title="AI Concierge", version="1.0.0")
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
-origins = ["*"] if ALLOWED_ORIGINS == "*" else [o.strip() for o in ALLOWED_ORIGINS.split(",")]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=False,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -414,21 +411,18 @@ Keep messages concise: 2-4 sentences per response unless explaining services in 
 Ask ONE question at a time. Build naturally on the prospect's responses.
 
 ## CONVERSATION FLOW
-The prospect has just watched a personal video introduction from {owner_name}.
-Your first message should warmly reference the video and transition into discovery.
+{"The prospect has just watched a personal video introduction from " + owner_name + ". Your first message should warmly reference the video and transition into discovery." if biz.get('video_url') else "Greet the prospect warmly and start discovery. Be direct and helpful from the first message."}
 
-IMPORTANT: Today's date is {datetime.now().strftime('%B %d, %Y')}. The current year is {datetime.now().year}. When guests mention dates without a year, assume they mean {datetime.now().year} (or {datetime.now().year + 1} if the date has clearly passed this year).
+IMPORTANT: Today's date is {datetime.now().strftime('%B %d, %Y')}. The current year is {datetime.now().year}. When people mention dates without a year, assume they mean {datetime.now().year} (or {datetime.now().year + 1} if the date has clearly passed this year).
 
 Flow:
-1. Warm handoff from video — reference {owner_name} and what they said
-2. Ask what kind of event/project they're planning
-3. Date and location
-4. Guest count / scope
-5. Which services interest them
-6. Budget range (frame naturally)
-7. If qualified: quote range + offer consultation
-8. Collect contact info + preferred times
-9. If not qualified: graceful redirect
+1. {"Warm handoff from video — reference " + owner_name if biz.get('video_url') else "Warm greeting — introduce yourself as " + biz.get('name', 'the business') + "'s AI assistant"}
+2. Understand what they need — ask the right qualifying question for this business
+3. Collect key details (timing, scope, specifics)
+4. Match to the right service and quote pricing
+5. If qualified: confirm details + guide toward booking
+6. Collect contact info if not already provided
+7. If not a fit: honest, graceful redirect
 
 {services_text}
 
