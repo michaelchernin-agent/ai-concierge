@@ -57,10 +57,18 @@ ADMIN_API_KEY = os.getenv("ADMIN_API_KEY", "")
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
 app = FastAPI(title="AI Concierge", version="1.0.0")
+
+# CORS — wildcard requires allow_credentials=False
+_cors_origins = ALLOWED_ORIGINS
+_cors_creds = True
+if "*" in ALLOWED_ORIGINS:
+    _cors_origins = ["*"]
+    _cors_creds = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    allow_credentials=_cors_creds,
     allow_methods=["*"],
     allow_headers=["*"],
 )
